@@ -1,0 +1,13 @@
+non_ground:
+  ros__parameters:
+    input_path: "/home/hy/wust_nav/src/bringup_nav/pcd/simulation/rmuc_2025.pcd"
+    roll: 3.1415926
+    pitch: 0.0
+    yaw: 0.0
+    z_min: -1.0
+    z_max: 0.5
+    max_slope_deg: 15.0
+    max_attempts: 5
+    distance_threshold: 0.05
+    use_projection: true
+    frame_id: "map"

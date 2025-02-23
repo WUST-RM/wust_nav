@@ -1,0 +1,7 @@
+selfhelp:
+  ros__parameters:
+    safe_threshold: 0.5
+    recovery_speed: 1.0
+    arrival_threshold: 0.1
+    final_turn_angle: 6.28
+    debug: true
