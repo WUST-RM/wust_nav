@@ -5,7 +5,7 @@
 #include <signal.h>
 #include "rclcpp/rclcpp.hpp"
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
-#include "auto_aim_interfaces/msg/time_and_health.hpp"
+#include "wust_interfaces/msg/referee.hpp"
 
 using namespace std::chrono_literals;
 

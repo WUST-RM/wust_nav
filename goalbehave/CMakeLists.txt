@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(auto_aim_interfaces REQUIRED)
+find_package(wust_interfaces REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
@@ -26,7 +26,7 @@ ament_target_dependencies(goal
   rclcpp 
   std_msgs 
   geometry_msgs 
-  auto_aim_interfaces
+  wust_interfaces
   tf2_ros
   tf2_geometry_msgs
   tf2

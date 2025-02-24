@@ -12,7 +12,7 @@
 #include <tf2_ros/transform_listener.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <chrono>
-#include "auto_aim_interfaces/msg/time_and_health.hpp"
+#include "wust_interfaces/msg/referee.hpp"
 #include <functional>
 #include <vector>
 

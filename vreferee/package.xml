@@ -2,16 +2,16 @@
 <package format="3">
   <name>vreferee</name>
   <version>1.0.0</version>
-  <description>Visual referee system with ROS2 and Qt</description>
+  <description>Visual referee system</description>
 
-  <maintainer email="your.email@domain.com">Your Team</maintainer>
+  <maintainer email="heiyuemoon@outlook.com">hy</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>auto_aim_interfaces</depend>
-  <depend>qtbase5-dev</depend>
+  <depend>wust_interfaces</depend>
+
 
   <export>
     <build_type>ament_cmake</build_type>
