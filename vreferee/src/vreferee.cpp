@@ -56,7 +56,7 @@ public:
       }
     );
 
-    publisher_ = this->create_publisher<auto_aim_interfaces::msg::TimeAndHealth>("/referee", 10);
+    publisher_ = this->create_publisher<wust_interfaces::msg::Referee>("/referee", 10);
     timer_ = this->create_wall_timer(
       1s, std::bind(&TimeAndHealthPublisher::timer_callback, this));
   }
@@ -65,7 +65,7 @@ public:
   {
     if (!running_) return;
     
-    auto message = auto_aim_interfaces::msg::TimeAndHealth();
+    auto message = wust_interfaces::msg::Referee();
     message.time = time_;
     message.health = health_;
     message.enable17mm = enable17mm_;
@@ -80,7 +80,7 @@ public:
   }
 
 private:
-  rclcpp::Publisher<auto_aim_interfaces::msg::TimeAndHealth>::SharedPtr publisher_;
+  rclcpp::Publisher<wust_interfaces::msg::Referee>::SharedPtr publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
   int time_;
   int health_;

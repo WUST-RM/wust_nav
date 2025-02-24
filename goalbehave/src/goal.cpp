@@ -3,7 +3,7 @@
 #include <std_msgs/msg/float32_multi_array.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <auto_aim_interfaces/msg/time_and_health.hpp>
+
 #include <nav2_msgs/action/navigate_to_pose.hpp>
 #include <nav2_msgs/action/navigate_through_poses.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
@@ -41,7 +41,7 @@ public:
       std::bind(&DataLogger::singlePointCallback, this, std::placeholders::_1));
 
     // 订阅时间和健康状态
-    time_health_sub_ = this->create_subscription<auto_aim_interfaces::msg::TimeAndHealth>(
+    time_health_sub_ = this->create_subscription<wust_interfaces::msg::Referee>(
       "/time_and_health", 10,
       std::bind(&DataLogger::timeHealthCallback, this, std::placeholders::_1));
 
@@ -89,7 +89,7 @@ private:
   }
 
   // 时间和健康状态的回调函数
-  void timeHealthCallback(const auto_aim_interfaces::msg::TimeAndHealth::SharedPtr msg) {
+  void timeHealthCallback(const wust_interfaces::msg::Referee::SharedPtr msg) {
     latest_time_health_ = *msg;
   }
 
@@ -186,7 +186,7 @@ bool ifin(double x, double y, const std_msgs::msg::Float32MultiArray& region) {
   // 订阅器
   rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr four_point_sub_;
   rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr single_point_sub_;
-  rclcpp::Subscription<auto_aim_interfaces::msg::TimeAndHealth>::SharedPtr time_health_sub_;
+  rclcpp::Subscription<wust_interfaces::msg::Referee>::SharedPtr time_health_sub_;
 
   // 计数器
   int four_point_counter_;
@@ -196,7 +196,7 @@ bool ifin(double x, double y, const std_msgs::msg::Float32MultiArray& region) {
   std::vector<geometry_msgs::msg::Point> all_single_points_;
 
   // 状态存储
-  auto_aim_interfaces::msg::TimeAndHealth latest_time_health_;
+  wust_interfaces::msg::Referee latest_time_health_;
 
   // Action 客户端
   rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr navigate_to_pose_client_;
