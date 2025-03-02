@@ -342,6 +342,25 @@ def generate_launch_description():
             ),
         ],
     )
+    costmap=Node(
+                package="costmap_all",
+                executable="costmap_all_node",
+                name="costmap_all_node",
+                output="screen",
+                arguments=["--ros-args", "--log-level", log_level],
+                parameters=[
+                    {"use_sim_time": use_sim_time},
+                    {"autostart": autostart},
+                    {"node_names": lifecycle_nodes},
+                ]
+            )
+    selfhelp =Node(
+            package='selfhelp',
+            executable='selfhelp_node',
+            name='selfhelp',
+            parameters=[configured_params],
+            output='screen'
+        )
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -362,5 +381,7 @@ def generate_launch_description():
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
+    ld.add_action(costmap)
+    ld.add_action(selfhelp)
 
     return ld

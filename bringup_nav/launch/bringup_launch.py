@@ -142,7 +142,7 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, "loc2.py")
+                    os.path.join(launch_dir, "slam_launch.py")
                 ),
                 condition=IfCondition(slam),
                 launch_arguments={

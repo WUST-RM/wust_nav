@@ -229,13 +229,7 @@ def generate_launch_description():
         output="screen",
         
     )
-    selfhelp =Node(
-            package='selfhelp',
-            executable='selfhelp_node',
-            name='selfhelp',
-            parameters=[configured_params],
-            output='screen'
-        )
+    
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -261,6 +255,6 @@ def generate_launch_description():
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
     #ld.add_action(pintlistnode)
-    ld.add_action(selfhelp)
+   # ld.add_action(selfhelp)
     #ld.add_action(start_static_transform_node2222)
     return ld

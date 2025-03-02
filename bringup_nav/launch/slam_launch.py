@@ -17,11 +17,13 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument 
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterFile
 from nav2_common.launch import RewrittenYaml
+from launch.actions import TimerAction
+
 
 
 def generate_launch_description():
@@ -45,7 +47,7 @@ def generate_launch_description():
     configured_params = ParameterFile(
         RewrittenYaml(
             source_file=params_file,
-         #   root_key=namespace,
+      #      root_key=namespace,
             param_rewrites=param_substitutions,
             convert_types=True,
         ),
@@ -55,7 +57,7 @@ def generate_launch_description():
     # Declare the launch arguments
   #  declare_namespace_cmd = DeclareLaunchArgument(
    #     "namespace", default_value="", description="Top-level namespace"
-  #  )
+   # )
 
     declare_params_file_cmd = DeclareLaunchArgument(
         "params_file",
@@ -107,6 +109,42 @@ def generate_launch_description():
             {"node_names": lifecycle_nodes},
         ],
     )
+
+    start_pointcloud_to_laserscan_node = Node(
+        package="pointcloud_to_laserscan",
+        executable="pointcloud_to_laserscan_node",
+        name="pointcloud_to_laserscan",
+        output="screen",
+        respawn=use_respawn,
+        respawn_delay=2.0,
+        parameters=[configured_params],
+        arguments=["--ros-args", "--log-level", log_level],
+        remappings=[
+            ("cloud_in", "terrain_map"),
+            ("scan", "obstacle_scan"),
+        ],
+    )
+
+    start_sync_slam_toolbox_node = TimerAction(
+    period=5.0,  # 延迟 5 秒
+    actions=[
+        Node(
+            package="slam_toolbox",
+            executable="sync_slam_toolbox_node",
+            name="slam_toolbox",
+            output="screen",
+            respawn=use_respawn,
+            respawn_delay=2.0,
+            parameters=[configured_params],
+            arguments=["--ros-args", "--log-level", log_level],
+            remappings=[
+                ("/map", "map"),
+                ("/map_metadata", "map_metadata"),
+                ("/map_updates", "map_updates"),
+            ],
+        )
+    ]
+)
 
     start_point_lio_node = Node(
         package="point_lio",
@@ -162,7 +200,10 @@ def generate_launch_description():
     ld.add_action(start_map_saver_server_cmd)
     ld.add_action(start_lifecycle_manager_cmd)
 
+    ld.add_action(start_pointcloud_to_laserscan_node)
+    
     ld.add_action(start_point_lio_node)
     ld.add_action(start_static_transform_node)
+    ld.add_action(start_sync_slam_toolbox_node)
 
     return ld

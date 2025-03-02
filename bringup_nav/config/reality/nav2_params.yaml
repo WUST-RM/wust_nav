@@ -1,3 +1,15 @@
+livox_ros_driver2:
+  ros__parameters:
+    xfer_format: 4                                      # 0-PointCloud2Msg(PointXYZRTL), 1-LivoxCustomMsg, 2-PclPxyziMsg, 3-LivoxImuMsg, 4-AllMsg
+    multi_topic: 0                                      # 0-All LiDARs share the same topic, 1-One LiDAR one topic
+    data_src: 0                                         # 0-lidar, others-Invalid data src
+    publish_freq: 10.0                                  # frequency of publish, 5.0, 10.0, 20.0, 50.0, etc.
+    output_data_type: 0
+    frame_id: front_mid360
+    user_config_path: $(find-pkg-share pb2025_nav_bringup)/config/reality/mid360_user_config.json
+    cmdline_input_bd_code: livox0000000001
+    lvx_file_path: ""
+
 point_lio:
   ros__parameters:
     use_imu_as_input: False                             # Change to True to use IMU as input of Point-LIO
@@ -92,32 +104,33 @@ sensor_scan_generation:
 terrain_analysis:
   ros__parameters:
     sensor_frame: "front_mid360"
-    scan_voxel_size: 0.05
-    decay_time: 0.5
-    no_decay_dis: 0.0
-    clearing_dis: 0.0
-    use_sorting: True
-    quantile_z: 0.4
-    consider_drop: False
-    limit_ground_lift: False
-    max_ground_lift: 0.3
-    clear_dy_obs: True
-    min_dy_obs_dis: 0.3
+    scan_voxel_size: 0.05               # 点云下采样
+    decay_time: 0.5                     # 点云时间差阈值 大于则不会被处理
+    no_decay_dis: 0.0                   # 点云距离阈值 小于该阈值不考虑时间差
+    clearing_dis: 0.0                   # 该距离外的点会被清除
+    use_sorting: True                   # 这个参数开起来就能上坡了；如果 use_sorting,那么就以周围点中的分位点作为地面点，否则以最低点作为地面点；周围其余点相对于地面点的高度作为通过代价，所以对于坡面，有的点的代价是正，有的是负，就相互抵消了；不要与 consider_drop 同时开启，计算上会有冲突
+    quantile_z: 0.2                     # useful if use_sorting is enabled.
+    consider_drop: False                # 考虑凹下去的地面,开启则将相对于地面点的高度取绝对值
+    limit_ground_lift: False            # useful if use_sorting is enabled
+    max_ground_lift: 0.3                # useful if use_sorting is enabled
+    clear_dy_obs: True                  # 清除动态物体的话，有动态物体走过的地方就走不了了
+    min_dy_obs_dis: 0.3                 # 以下参数都是在 clear_dy_obs 的情况下才有用的
     min_dy_obs_angle: 0.0
     min_dy_obs_rel_z: -0.3
     abs_dy_obs_rel_z_thre: 0.2
     min_dy_obs_vfov: -28.0
     max_dy_obs_vfov: 33.0
     min_dy_obs_point_num: 1
-    no_data_obstacle: False
+    no_data_obstacle: False             # treat no data as obstacle
     no_data_block_skip_num: 0
     min_block_point_num: 10
-    vehicle_height: 0.5
+    vehicle_height: 0.5                 # 小于车辆高度的点才会进行处理
     voxel_point_update_thre: 100
     voxel_time_update_thre: 1.0
-    min_rel_z: -1.5
+    min_rel_z: -1.5                     # min_rel_z 以及 max_rel_z 限制了有效点云点的Z值范围，用于对天花板和地板进行处理
     max_rel_z: 0.5
-    dis_ratio_z: 0.2
+    dis_ratio_z: 0.2                    # Z 值的最大最小范围由这两个值决定，但是并不等于这两个值，是有一个比例关系的，距离机器人越远，限定范围就越大，这其中考虑了坡度
+
 
 fake_vel_transform:
   ros__parameters:
@@ -133,9 +146,9 @@ small_gicp_relocalization:
   ros__parameters:
     use_sim_time: false
     num_threads: 4
-    num_neighbors: 10
-    global_leaf_size: 0.25
-    registered_leaf_size: 0.25
+    num_neighbors: 20
+    global_leaf_size: 0.15
+    registered_leaf_size: 0.05
     max_dist_sq: 1.0
     map_frame: "map"
     odom_frame: "odom"
@@ -144,6 +157,97 @@ small_gicp_relocalization:
     lidar_frame: "front_mid360"
     # The prior_pcd_file does not need to be specified since it going to be set by defaults in launch.
     # prior_pcd_file: ""
+
+pointcloud_to_laserscan:
+  ros__parameters:
+    use_sim_time: false
+    target_frame: chassis
+    min_height: -0.5
+    max_height: 6.0
+    min_intensity: 0.1
+    max_intensity: 2.0
+    angle_min: -3.1415926                   # -M_PI/2
+    angle_max: 3.1415926                    # M_PI/2
+    angle_increment: 0.00872665             # M_PI/360.0
+    scan_time: 0.05
+    range_min: 0.3
+    range_max: 10.0
+    use_inf: true
+
+slam_toolbox:
+  ros__parameters:
+    # https://github.com/SteveMacenski/slam_toolbox/tree/humble?#configuration
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_footprint
+    scan_topic: obstacle_scan
+    use_map_saver: true
+    mode: mapping
+
+    # if you'd like to immediately start continuing a map at a given pose
+    # or at the dock, but they are mutually exclusive, if pose is given
+    # will use pose
+    # map_file_name: test_steve
+    # map_start_pose: [0.0, 0.0, 0.0]
+    # map_start_at_dock: true
+
+    debug_logging: false
+    throttle_scans: 1
+    scan_queue_size: 10
+    transform_publish_period: 0.0                # if 0 never publishes odometry
+    map_update_interval: 1.0
+    resolution: 0.05
+    min_laser_range: 0.3                         # for rastering images
+    max_laser_range: 10.0                         # for rastering images
+    minimum_time_interval: 0.5
+    transform_timeout: 0.2
+    tf_buffer_duration: 10.
+    stack_size_to_use: 40000000                   # program needs a larger stack size to serialize large maps
+    enable_interactive_mode: true
+
+    # General Parameters
+    use_scan_matching: false
+    use_scan_barycenter: true
+    minimum_travel_distance: 0.5
+    minimum_travel_heading: 0.3
+    scan_buffer_size: 10
+    scan_buffer_maximum_scan_distance: 10.0
+    link_match_minimum_response_fine: 0.1
+    link_scan_maximum_distance: 1.5
+    loop_search_maximum_distance: 3.0
+    do_loop_closing: false
+    loop_match_minimum_chain_size: 10
+    loop_match_maximum_variance_coarse: 3.0
+    loop_match_minimum_response_coarse: 0.35
+    loop_match_minimum_response_fine: 0.45
+
+    # Correlation Parameters - Correlation Parameters
+    correlation_search_space_dimension: 0.5
+    correlation_search_space_resolution: 0.01
+    correlation_search_space_smear_deviation: 0.1
+
+    # Correlation Parameters - Loop Closure Parameters
+    loop_search_space_dimension: 8.0
+    loop_search_space_resolution: 0.05
+    loop_search_space_smear_deviation: 0.03
+
+    # Scan Matcher Parameters
+    distance_variance_penalty: 5.5
+    angle_variance_penalty: 5.0
+
+    fine_search_angle_offset: 0.00349
+    coarse_search_angle_offset: 0.349
+    coarse_angle_resolution: 0.0349
+    minimum_angle_penalty: 0.9
+    minimum_distance_penalty: 0.5
+    use_response_expansion: true
 
 bt_navigator:
   ros__parameters:
@@ -336,21 +440,23 @@ local_costmap:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
       obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"  # 使用ObstacleLayer插件
-        enabled: true                             # 启用障碍图层
-        observation_sources: mid360_pointcloud    # 设置障碍物来源，名称为mid360_pointcloud
-        mid360_pointcloud:                        # 配置点云数据来源
-          topic: /terrain_map               # 点云数据话题
-          data_type: PointCloud2                  # 数据类型为PointCloud2
-          marking: true                           # 用于标记障碍物
-          clearing: true                          # 用于清理无障碍区域
-          obstacle_range: 10.0                    # 障碍物感知的最大距离（单位：米）
-          raytrace_range: 12.0                    # 清理的最大射线追踪范围
-          max_obstacle_height: 2.0                # 障碍物的最大高度（单位：米）
-          min_obstacle_height: 0.0                # 障碍物的最小高度（单位：米）
-          observation_persistence: 0.0            # 观察数据的持续时间（秒）
-          expected_update_rate: 0.0               # 点云更新频率（Hz），0表示不限
-          inf_is_valid: false                     # 是否处理无穷远的数据  
+        plugin: "pb_nav2_costmap_2d::IntensityObstacleLayer"
+        enabled: True
+        footprint_clearing_enabled: True
+        min_obstacle_intensity: 0.1
+        max_obstacle_intensity: 2.0
+        observation_sources: terrain_map
+        terrain_map:
+          topic: /terrain_map
+          clearing: True
+          marking: True
+          data_type: "PointCloud2"
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+          obstacle_max_range: 5.0
+          obstacle_min_range: 0.2
+          raytrace_max_range: 8.0
+          raytrace_min_range: 0.2
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 4.0
@@ -487,7 +593,7 @@ behavior_server:
     spin:
       plugin: "nav2_behaviors/Spin"
     backup:
-      plugin: "nav2_behaviors/BackUp"
+      plugin: "pb_nav2_behaviors/BackUpFreeSpace"
     drive_on_heading:
       plugin: "nav2_behaviors/DriveOnHeading"
     wait:
@@ -502,6 +608,12 @@ behavior_server:
     max_rotational_vel: 1.0
     min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
+    # params for pb_nav2_behaviors/BackUpFreeSpace
+    robot_radius: 0.2
+    max_radius: 3.5
+    service_name: "global_costmap/get_costmap"
+    free_threshold: 5
+    visualize: false
 
 waypoint_follower:
   ros__parameters:
