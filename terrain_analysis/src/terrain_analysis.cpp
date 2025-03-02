@@ -54,6 +54,7 @@ TerrainAnalysisNode::TerrainAnalysisNode(const rclcpp::NodeOptions & options)
   declare_parameter<double>("min_rel_z", min_rel_z_);
   declare_parameter<double>("max_rel_z", max_rel_z_);
   declare_parameter<double>("dis_ratio_z", dis_ratio_z_);
+  declare_parameter<double>("min_dis_z", min_dis_z);
 
   get_parameter("sensor_frame", sensor_frame_);
   get_parameter("scan_voxel_size", scan_voxel_size_);
@@ -67,7 +68,7 @@ TerrainAnalysisNode::TerrainAnalysisNode(const rclcpp::NodeOptions & options)
   get_parameter("max_ground_lift", max_ground_lift_);
   get_parameter("clear_dy_obs", clear_dy_obs_);
   get_parameter("min_dy_obs_dis", min_dy_obs_dis_);
-  get_parameter("minDyObAngle", min_dy_obs_angle_);
+  get_parameter("min_dy_obs_angle", min_dy_obs_angle_);
   get_parameter("min_dy_obs_rel_z", min_dy_obs_rel_z_);
   get_parameter("abs_dy_obs_rel_z_thre", abs_dy_obs_rel_z_thre_);
   get_parameter("min_dy_obs_vfov", min_dy_obs_vfov_);
@@ -82,6 +83,7 @@ TerrainAnalysisNode::TerrainAnalysisNode(const rclcpp::NodeOptions & options)
   get_parameter("min_rel_z", min_rel_z_);
   get_parameter("max_rel_z", max_rel_z_);
   get_parameter("dis_ratio_z", dis_ratio_z_);
+  get_parameter("min_dis_z", min_dis_z);
 
   laser_cloud_ = std::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
   laser_cloud_crop_ = std::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
@@ -505,7 +507,7 @@ void TerrainAnalysisNode::processLaserCloud()
           int planar_point_elev_size =
             planar_point_elev_[planar_voxel_width_ * ind_x + ind_y].size();
           if (
-            dis_z >= 0.1 && dis_z < vehicle_height_ &&
+            dis_z >=min_dis_z && dis_z < vehicle_height_ &&
             planar_point_elev_size >= min_block_point_num_) {
             terrain_cloud_elev_->push_back(point);
             terrain_cloud_elev_->points[terrain_cloud_elev_size].intensity = dis_z;

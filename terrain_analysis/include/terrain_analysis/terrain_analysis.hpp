@@ -75,6 +75,7 @@ private:
   double max_rel_z_;
   double dis_ratio_z_;
 
+  float min_dis_z;
   // terrain voxel parameters
   int terrain_voxel_shift_x_ = 0;
   int terrain_voxel_shift_y_ = 0;
