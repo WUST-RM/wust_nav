@@ -112,7 +112,7 @@ cd ~/ros_ws
 ```
 
 ```bash
-git clone --recursive https://github.com/SMBU-PolarBear-Robotics-Team/pb2025_sentry_nav.git src/pb2025_sentry_nav
+git clone --recursive https://github.com/WUST-RM/wust_nav.git src/wust_nav
 ```
 
 下载先验点云:
@@ -145,7 +145,7 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 导航模式：
 
 ```bash
-ros2 launch pb2025_nav_bringup rm_navigation_simulation_launch.py \
+ros2 launch bringup_nav rm_navigation_simulation_launch.py \
 world:=rmuc_2025 \
 slam:=False
 ```
@@ -153,18 +153,18 @@ slam:=False
 建图模式：
 
 ```bash
-ros2 launch pb2025_nav_bringup rm_navigation_simulation_launch.py \
+ros2 launch bringup_nav rm_navigation_simulation_launch.py \
 slam:=True
 ```
 
-保存栅格地图：`ros2 run nav2_map_server map_saver_cli -f <YOUR_MAP_NAME>  --ros-args -r __ns:=/red_standard_robot1`
+保存栅格地图：`ros2 run nav2_map_server map_saver_cli -f <YOUR_MAP_NAME> 
 
 多机器人 (实验性功能) :
 
 当前指定的初始位姿实际上是无效的。TODO: 加入 `map` -> `odom` 的变换和初始化
 
 ```bash
-ros2 launch pb2025_nav_bringup rm_multi_navigation_simulation_launch.py \
+ros2 launch bringup_nav rm_multi_navigation_simulation_launch.py \
 world:=rmul_2024 \
 robots:=" \
 red_standard_robot1={x: 0.0, y: 0.0, yaw: 0.0}; \
@@ -177,19 +177,18 @@ blue_standard_robot1={x: 5.6, y: 1.4, yaw: 3.14}; \
 建图模式：
 
 ```bash
-ros2 launch pb2025_nav_bringup rm_navigation_reality_launch.py \
+ros2 launch bringup_nav rm_navigation_reality_launch.py \
 slam:=True \
 use_robot_state_pub:=True
 ```
 
-保存栅格地图：`ros2 run nav2_map_server map_saver_cli -f <YOUR_MAP_NAME>  --ros-args -r __ns:=/red_standard_robot1`
-
+保存栅格地图：`ros2 run nav2_map_server map_saver_cli -f <YOUR_MAP_NAME>  
 导航模式：
 
 注意修改 `world` 参数为实际地图的名称
 
 ```bash
-ros2 launch pb2025_nav_bringup rm_navigation_reality_launch.py \
+ros2 launch bringup_nav rm_navigation_reality_launch.py \
 world:=<YOUR_WORLD_NAME> \
 slam:=False \
 use_robot_state_pub:=True
