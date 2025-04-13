@@ -22,3 +22,9 @@
 [submodule "mapcalibration"]
 	path = mapcalibration
 	url = https://github.com/WUST-RM/mapcalibration
+[submodule "selfhelp"]
+	path = selfhelp
+	url = https://github.com/WUST-RM/selfhelp
+[submodule "manualtoauto"]
+	path = manualtoauto
+	url = https://github.com/WUST-RM/manualtoauto
