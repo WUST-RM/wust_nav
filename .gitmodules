@@ -28,3 +28,6 @@
 [submodule "manualtoauto"]
 	path = manualtoauto
 	url = https://github.com/WUST-RM/manualtoauto
+[submodule "FAST_LIO_ROS2"]
+	path = FAST_LIO_ROS2
+	url = https://github.com/hyheiyue/FAST_LIO_ROS2.git
