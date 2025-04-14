@@ -687,7 +687,7 @@ int main(int argc, char **argv) {
       pcl::toROSMsg(*terrainCloudElev, terrainCloud2);
       terrainCloud2.header.stamp =
           rclcpp::Time(static_cast<uint64_t>(laserCloudTime * 1e9));
-      terrainCloud2.header.frame_id = "map";
+      terrainCloud2.header.frame_id = "odom";
       pubLaserCloud->publish(terrainCloud2);
     }
 
