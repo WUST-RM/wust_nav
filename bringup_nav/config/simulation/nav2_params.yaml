@@ -54,6 +54,7 @@ point_lio:
       ivox_grid_resolution: 0.5
       gravity: [ 0.0, 0.0, 9.80065]        # gravity to be aligned # rpy = [0, pi/6, 0]
       gravity_init: [ 0.0, 0.0 , 9.80065 ]   # preknown gravity in the first IMU body frame, use when imu_en is False or start from a non-stationary state
+      align_gravity_en: True
       extrinsic_T: [ 0.0, 0.0, 0.0 ]
       extrinsic_R: [ 1.0, 0.0, 0.0,
                       0.0, 1.0, 0.0,
