@@ -1,9 +1,6 @@
 [submodule "livox_ros_driver2"]
 	path = livox_ros_driver2
 	url = https://github.com/SMBU-PolarBear-Robotics-Team/livox_ros_driver2.git
-[submodule "point_lio"]
-	path = point_lio
-	url = https://github.com/SMBU-PolarBear-Robotics-Team/point_lio.git
 [submodule "pb_omni_pid_pursuit_controller"]
 	path = pb_omni_pid_pursuit_controller
 	url = https://github.com/SMBU-PolarBear-Robotics-Team/pb_omni_pid_pursuit_controller.git
