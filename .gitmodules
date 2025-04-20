@@ -28,3 +28,6 @@
 [submodule "FAST_LIO_ROS2"]
 	path = FAST_LIO_ROS2
 	url = https://github.com/hyheiyue/FAST_LIO_ROS2.git
+[submodule "Point-LIO"]
+	path = Point-LIO
+	url = https://github.com/hyheiyue/Point-LIO.git
