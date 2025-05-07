@@ -199,7 +199,7 @@ def generate_launch_description():
             {"pcd_save.pcd_save_en": True},
         ],
       #  arguments=["--ros-args", "--log-level", log_level],
-        remappings=[("path", "path1")],
+        
 
     )
 

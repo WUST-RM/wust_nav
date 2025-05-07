@@ -65,7 +65,7 @@ point_lio:
       match_s: 81.0
       ivox_grid_resolution: 0.5
       gravity: [0.0, 0.0 , -9.80065]                   # gravity to be aligned # rpy = [0, pi/6, 0]
-      gravity_init: [0.0, 0.0 , -9.80065]              # preknown gravity in the first IMU body frame, use when imu_en is False or start from a non-stationary state
+      gravity_init: [0.0, 0.0 , 9.80065]              # preknown gravity in the first IMU body frame, use when imu_en is False or start from a non-stationary state
       align_gravity_en: True
       extrinsic_T: [ -0.011, -0.02329, 0.04412 ]
       extrinsic_R: [ 1.0, 0.0, 0.0,
@@ -73,13 +73,13 @@ point_lio:
                       0.0, 0.0, 1.0 ]
 
     odometry:
-      publish_odometry_without_downsample: True
+      publish_odometry_without_downsample: False
 
     publish:
       path_en: False                                    # False: close the path output
       scan_publish_en: True                             # False: close all the point cloud output
       scan_bodyframe_pub_en: False                      # True: output the point cloud scans in IMU-body-frame
-      tf_send_en: False                                 # True: send transform from 'camera_init' to 'aft_mapped'
+      tf_send_en: True                                 # True: send transform from 'camera_init' to 'aft_mapped'
 
     pcd_save:
       pcd_save_en: True
@@ -176,6 +176,7 @@ small_gicp_relocalization:
     base_frame: "base_footprint"
     robot_base_frame: "gimbal_yaw"
     lidar_frame: "front_mid360"
+    init_pose: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
     # The prior_pcd_file does not need to be specified since it going to be set by defaults in launch.
     # prior_pcd_file: ""
 
@@ -498,7 +499,7 @@ local_costmap:
         observation_sources:      mark clear
         mark:
           data_type: PointCloud2
-          topic: /terrain_map
+          topic: terrain_map
           marking: true
           clearing: false
           obstacle_range: 5.0                                       # meters
@@ -513,7 +514,7 @@ local_costmap:
         clear:
           enabled: true                                             # default true, can be toggled on/off with associated service call
           data_type: PointCloud2
-          topic: /terrain_map
+          topic: terrain_map
           marking: false
           clearing: true
           max_z: 5.0                                                # default 10, meters
@@ -535,7 +536,7 @@ local_costmap:
         observation_sources: terrain_map
         track_unknown_space: true    # 将未知区域视为自由空间
         terrain_map:
-          topic: /terrain_map
+          topic: terrain_map
           clearing: True
           marking: True
           data_type: "PointCloud2"
@@ -673,7 +674,7 @@ global_costmap:
         observation_sources:      mark clear
         mark:
           data_type: PointCloud2
-          topic: /terrain_map
+          topic: terrain_map_ext
           marking: true
           clearing: false
           obstacle_range: 10.0                                       # meters
@@ -688,7 +689,7 @@ global_costmap:
         clear:
           enabled: true                                             # default true, can be toggled on/off with associated service call
           data_type: PointCloud2
-          topic: /terrain_map
+          topic: terrain_map_ext
           marking: false
           clearing: true
           max_z: 5.0                                                # default 10, meters

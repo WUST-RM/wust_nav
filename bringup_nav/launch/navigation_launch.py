@@ -116,11 +116,13 @@ def generate_launch_description():
     start_terrain_analysis_cmd = Node(
         package="terrain_analysis",
         executable="terrainAnalysis",
+        #executable="terrain_analysis_node",
         name="terrain_analysis",
         output="screen",
         respawn=use_respawn,
         respawn_delay=2.0,
         arguments=["--ros-args", "--log-level", log_level],
+        #remappings=[('/terrain_map', 'terrain_map')],
         parameters=[configured_params],
     )
 

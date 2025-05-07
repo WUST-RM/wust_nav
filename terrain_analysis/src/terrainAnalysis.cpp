@@ -15,6 +15,8 @@
 // Original work based on sensor_scan_generation package by Hongbiao Zhu.
 
 #include <math.h>
+#include <pcl_ros/transforms.hpp>
+#include <string>
 
 #include "nav_msgs/msg/odometry.hpp"
 #include "pcl/filters/voxel_grid.h"
@@ -28,6 +30,8 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tf2_ros/transform_broadcaster.h"
 
+
+std::string sensor_frame_;
 double scanVoxelSize = 0.05;
 double decayTime = 2.0;
 double noDecayDis = 4.0;
@@ -107,9 +111,10 @@ float sinVehiclePitch = 0, cosVehiclePitch = 0;
 float sinVehicleYaw = 0, cosVehicleYaw = 0;
 
 pcl::VoxelGrid<pcl::PointXYZI> downSizeFilter;
-
+nav_msgs::msg::Odometry odom_;
 // state estimation callback function
 void odometryHandler(const nav_msgs::msg::Odometry::ConstSharedPtr odom) {
+  odom_=*odom;
   double roll, pitch, yaw;
   geometry_msgs::msg::Quaternion geoQuat = odom->pose.pose.orientation;
   tf2::Matrix3x3(tf2::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w))
@@ -199,6 +204,7 @@ int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("terrainAnalysis");
 
+  nh->declare_parameter<std::string>("sensor_frame", sensor_frame_);
   nh->declare_parameter<double>("scanVoxelSize", scanVoxelSize);
   nh->declare_parameter<double>("decayTime", decayTime);
   nh->declare_parameter<double>("noDecayDis", noDecayDis);
@@ -227,6 +233,7 @@ int main(int argc, char **argv) {
   nh->declare_parameter<double>("disRatioZ", disRatioZ);
   nh->declare_parameter<double>("min_dis_z", min_dis_z);
  
+  nh->get_parameter("sensor_frame", sensor_frame_);
   nh->get_parameter("scanVoxelSize", scanVoxelSize);
   nh->get_parameter("decayTime", decayTime);
   nh->get_parameter("noDecayDis", noDecayDis);
@@ -269,6 +276,9 @@ int main(int argc, char **argv) {
 
   auto pubLaserCloud =
       nh->create_publisher<sensor_msgs::msg::PointCloud2>("terrain_map", 2);
+
+      auto pubLidarCloud =
+      nh->create_publisher<sensor_msgs::msg::PointCloud2>("terrain_map_lidar", 2);
 
   for (int i = 0; i < kTerrainVoxelNum; i++) {
     terrainVoxelCloud[i].reset(new pcl::PointCloud<pcl::PointXYZI>());
@@ -688,7 +698,14 @@ int main(int argc, char **argv) {
       terrainCloud2.header.stamp =
           rclcpp::Time(static_cast<uint64_t>(laserCloudTime * 1e9));
       terrainCloud2.header.frame_id = "odom";
+      sensor_msgs::msg::PointCloud2 terrain_cloud_lidar;
+    tf2::Transform tf_odom_to_lidar;
+    tf2::fromMsg(odom_.pose.pose, tf_odom_to_lidar);
+    pcl_ros::transformPointCloud(
+    sensor_frame_, tf_odom_to_lidar.inverse(), terrainCloud2, terrain_cloud_lidar);
       pubLaserCloud->publish(terrainCloud2);
+      pubLidarCloud->publish(terrain_cloud_lidar);
+      
     }
 
     // status = ros::ok();

@@ -126,7 +126,7 @@ def generate_launch_description():
     )
 
     start_sync_slam_toolbox_node = TimerAction(
-    period=5.0,  # 延迟 5 秒
+    period=4.0,  # 延迟 5 秒
     actions=[
         Node(
             package="slam_toolbox",
